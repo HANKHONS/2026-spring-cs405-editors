@@ -31,7 +31,7 @@ Evicting $A$ would be a bad choice as we would need it again after 2 steps.
 Evicting $B$ would be better choice but not the best as we would need it again after 10 steps.
 Evicting $C$ would be the best choice as it will need be never requested again.
 
-This leads to the **Farthest-in-Future (FF)** strategy: *Always evict the item in the cache whose next access is furthest in the future.*
+When $d_i$ needs to be brought into the cache, evict the item that is needed the farthest into the future.We call this the **Farthest-in-Future Algorithm**.
 
 ## Pseudocode
 
@@ -114,3 +114,73 @@ In all valid scenarios, we successfully created a schedule $S'$ that agrees with
 $$\text{Misses}(S') \le \text{Misses}(S^*)$$
 
 By repeatedly applying this exchange step at every point where the schedules diverge, we can completely transform the optimal schedule $S^*$ into $S_{FF}$ without ever increasing the miss count. Therefore, $S_{FF}$ is also an optimal schedule.
+
+
+
+## Caching Strategies in Modern CPUs
+
+### 1. Least Recently Used (LRU) and Why It’s Rarely Exact
+
+The most straightforward hardware policy is LRU (Least Recently Used). This policy evicts the block that hasn’t been accessed for the longest time.
+
+Why LRU?
+
+It approximates First In, First Out (FiF) for temporal locality.
+
+Programs tend to reuse data they accessed recently.
+
+However, true LRU requires tracking the exact order of accesses within each set. For an $n$-way set, true LRU needs a complete ordering, which is costly in hardware.
+
+As associativity increases (for example, 16-way), true LRU becomes too expensive.
+
+So, CPUs rarely use true LRU.
+
+### 2. Pseudo-LRU (PLRU)
+
+Rather than using exact ordering, CPUs often use Pseudo-LRU.
+
+A common method is tree-based PLRU.
+
+This method maintains a small binary tree of bits for each set. Each bit shows which subtree was used more recently.
+
+When evicting a block, you follow the bits to locate a “less recently used” candidate.
+
+Advantages:
+
+It requires only $n-1$ bits for an $n$-way set.
+
+The hardware logic is very fast.
+
+Tradeoff:
+
+It does not always provide the true least recently used block.
+
+But it is close enough for most workloads.
+
+This is one of those engineering compromises: the decision quality may be slightly worse, but the circuitry is much simpler.
+
+---
+## Related Problems
+
+LeetCode:
+
+- LRU Cache : 
+  https://leetcode.com/problems/lru-cache/
+
+- LFU Cache :
+  https://leetcode.com/problems/lfu-cache/
+
+- Design Browser History (stack-like recency behavior) :
+  https://leetcode.com/problems/design-browser-history/
+
+- Cache With Time Limit :
+  https://leetcode.com/problems/cache-with-time-limit/
+
+Codeforces:
+
+- Little Elephant and Array (cache-style simulation flavor) :
+  https://codeforces.com/problemset/problem/220/B
+
+- Valera and Queries (offline processing idea — useful for understanding future knowledge tricks) :
+  https://codeforces.com/problemset/problem/369/E
+---
