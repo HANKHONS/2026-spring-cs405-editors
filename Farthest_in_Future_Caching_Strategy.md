@@ -117,47 +117,20 @@ By repeatedly applying this exchange step at every point where the schedules div
 
 
 
+
 ## Caching Strategies in Modern CPUs
 
-### 1. Least Recently Used (LRU) and Why It’s Rarely Exact
+### 1. Least Recently Used (LRU)
 
-The most straightforward hardware policy is LRU (Least Recently Used). This policy evicts the block that hasn’t been accessed for the longest time.
-
-Why LRU?
-
-It approximates First In, First Out (FiF) for temporal locality.
-
-Programs tend to reuse data they accessed recently.
-
-However, true LRU requires tracking the exact order of accesses within each set. For an $n$-way set, true LRU needs a complete ordering, which is costly in hardware.
-
-As associativity increases (for example, 16-way), true LRU becomes too expensive.
-
-So, CPUs rarely use true LRU.
+Least Recently Used (LRU) is a common cache eviction algorithm that discards the least recently accessed items first when the cache reaches capacity. It operates on the principle that data accessed recently is likely to be accessed again soon. It is commonly implemented using a hash map combined with a doubly linked list.
 
 ### 2. Pseudo-LRU (PLRU)
 
-Rather than using exact ordering, CPUs often use Pseudo-LRU.
+A popular and effective approximation of actual LRU. Instead of keeping an ideal, ordered list of items, it tracks usage using tree-based bits or a "Clock" algorithm (a bit per cache line).
 
-A common method is tree-based PLRU.
+### 3.RRIP (Re-Reference Interval Prediction)
 
-This method maintains a small binary tree of bits for each set. Each bit shows which subtree was used more recently.
-
-When evicting a block, you follow the bits to locate a “less recently used” candidate.
-
-Advantages:
-
-It requires only $n-1$ bits for an $n$-way set.
-
-The hardware logic is very fast.
-
-Tradeoff:
-
-It does not always provide the true least recently used block.
-
-But it is close enough for most workloads.
-
-This is one of those engineering compromises: the decision quality may be slightly worse, but the circuitry is much simpler.
+RRIP, a more recent version of LRU, expects when a line will be used again, managing "streaming" data that could otherwise damage the cache and remove frequently used, helpful items.
 
 ---
 ## Related Problems
