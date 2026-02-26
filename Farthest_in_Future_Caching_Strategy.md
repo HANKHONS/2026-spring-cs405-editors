@@ -1,42 +1,35 @@
 # Editorial: Farthest-in-Future Caching
 
-## Motivating the Problem
+## Introduction
+Caching in computer system helps store small amounts of data in a fast memory  which helps in easy and fast access of data.
 
-Caches are incredibly fast but very small. Since we can't fit everything in the cache, we constantly have to decide what to kick out when bringing new data in.
+If the requested data is present in the cache it is called cache hit.
 
-To optimize performance, a computer tries to keep the most frequently needed data in the cache. 
-- **Cache Hit:** The requested data is already in the cache. Processing continues instantly.
-- **Cache Miss:** The requested data is absent. We must fetch it from main memory. 
+If the requested data is not present in the cache it is called cache miss.
 
-If a cache miss occurs and the cache is already full, the system is forced to **evict** an existing item to make room for the new one. 
+When a cache miss occurs and the cache is full, an existing item must be evicted to make room for the new data.
+## The Problem 
+Suppose we have a cache $C$ which hold exactly k items.
 
-The fundamental algorithmic question of offline caching is: *Given a known sequence of future memory requests, which item should we evict from a full cache to minimize the total number of cache misses over time?*
+$D = d_1, d_2, \dots, d_n$ are a sequence of memory references given to us.
 
-## Problem Statement
+- If $d_i\$ is already present in the cache it is a cache hit.
+- If $d_i\$ is not present in the cache it is a cache miss and  $d_i\$ must be brought into cache .
+- If cache is full and $d_i\$ is not present in the cache we will need to evict some other piece of data already present in the cache to make room for $d_i\$ .
 
-Let's define the caching problem formally:
+**To Find:** The sequence of evictions that incurs as few cache misses as possible.
 
-- We have a cache $C$ capable of holding exactly $k$ items.
-- We are given a sequence of requests $D = d_1, d_2, \dots, d_n$.
-- For each request $d_i$ at time $i$:
-    - If $d_i \in C$, we have a hit.
-    - If $d_i \notin C$, we have a miss and $d_i$ must be brought into $C$.
-    - If $|C| = k$ during a miss, we must choose an item $e \in C$ to evict.
-
-**Objective:** Determine the sequence of evictions that minimizes total cache misses.
-
-## Intuition Behind the Greedy Strategy
-
-When designing a greedy algorithm, we want to make the locally optimal choice at each step. For caching, the most intuitive approach is to look ahead into the sequence of future requests. 
+## The Intuition
+We have a cache which holds 3 items= ${A,B,C}$
 
 Suppose our cache is full and we must choose an item to evict:
 - Item $A$ will be requested again in 2 steps.
 - Item $B$ will be requested again in 10 steps.
 - Item $C$ will never be requested again.
 
-Evicting $A$ is a terrible choice; we will suffer another cache miss almost immediately when we need it in 2 steps. 
-Evicting $C$ is the safest choice because we will never suffer a miss for it again. 
-If no such item $C$ exists, evicting $B$ makes the most sense because it delays our next inevitable cache miss for as long as possible. 
+Evicting $A$ would be a bad choice as we would need it again after 2 steps.
+Evicting $B$ would be better choice but not the best as we would need it again after 10 steps.
+Evicting $C$ would be the best choice as it will need be never requested again.
 
 This leads to the **Farthest-in-Future (FF)** strategy: *Always evict the item in the cache whose next access is furthest in the future.*
 
